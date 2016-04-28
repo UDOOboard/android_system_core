@@ -471,7 +471,6 @@ typedef enum {
     EVENT_TYPE_LONG     = 1,
     EVENT_TYPE_STRING   = 2,
     EVENT_TYPE_LIST     = 3,
-    EVENT_TYPE_FLOAT    = 4,
 } AndroidEventLogType;
 #define sizeof_AndroidEventLogType sizeof(typeof_AndroidEventLogType)
 #define typeof_AndroidEventLogType unsigned char
@@ -488,13 +487,6 @@ typedef enum {
         long long longBuf = _value;                                         \
         (void) android_btWriteLog(_tag, EVENT_TYPE_LONG, &longBuf,          \
             sizeof(longBuf));                                               \
-    }
-#endif
-#ifndef LOG_EVENT_FLOAT
-#define LOG_EVENT_FLOAT(_tag, _value) {                                     \
-        float floatBuf = _value;                                            \
-        (void) android_btWriteLog(_tag, EVENT_TYPE_FLOAT, &floatBuf,        \
-            sizeof(floatBuf));                                              \
     }
 #endif
 #ifndef LOG_EVENT_STRING
@@ -542,30 +534,8 @@ typedef enum {
 #define android_btWriteLog(tag, type, payload, len) \
     __android_log_btwrite(tag, type, payload, len)
 
-#define android_errorWriteLog(tag, subTag) \
-    __android_log_error_write(tag, subTag, -1, NULL, 0)
-
-#define android_errorWriteWithInfoLog(tag, subTag, uid, data, dataLen) \
-    __android_log_error_write(tag, subTag, uid, data, dataLen)
-
-/*
- *    IF_ALOG uses android_testLog, but IF_ALOG can be overridden.
- *    android_testLog will remain constant in its purpose as a wrapper
- *        for Android logging filter policy, and can be subject to
- *        change. It can be reused by the developers that override
- *        IF_ALOG as a convenient means to reimplement their policy
- *        over Android.
- */
-#if LOG_NDEBUG /* Production */
-#define android_testLog(prio, tag) \
-    (__android_log_is_loggable(prio, tag, ANDROID_LOG_DEBUG) != 0)
-#else
-#define android_testLog(prio, tag) \
-    (__android_log_is_loggable(prio, tag, ANDROID_LOG_VERBOSE) != 0)
-#endif
-
 // TODO: remove these prototypes and their users
-// #define android_testLog(prio, tag) (1)
+#define android_testLog(prio, tag) (1)
 #define android_writevLog(vec,num) do{}while(0)
 #define android_write1Log(str,len) do{}while (0)
 #define android_setMinPriority(tag, prio) do{}while(0)
@@ -581,21 +551,11 @@ typedef enum log_id {
     LOG_ID_EVENTS = 2,
     LOG_ID_SYSTEM = 3,
     LOG_ID_CRASH = 4,
-    LOG_ID_KERNEL = 5,
 
     LOG_ID_MAX
 } log_id_t;
 #define sizeof_log_id_t sizeof(typeof_log_id_t)
 #define typeof_log_id_t unsigned char
-
-/*
- * Use the per-tag properties "log.tag.<tagname>" to generate a runtime
- * result of non-zero to expose a log.
- */
-int __android_log_is_loggable(int prio, const char *tag, int def);
-
-int __android_log_error_write(int tag, const char *subTag, int32_t uid, const char *data,
-                              uint32_t dataLen);
 
 /*
  * Send a simple string to the log.

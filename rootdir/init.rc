@@ -30,6 +30,8 @@ on early-init
     mkdir /mnt 0775 root system
 
 on init
+    restart ueventd
+
     sysclktz 0
 
     loglevel 3

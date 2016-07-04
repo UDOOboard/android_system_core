@@ -374,7 +374,6 @@ void fix_fstab_path(const char *filename, char *fstab_final)
     } else {
 	sprintf(fstab_final, "%s", filename);
     }
-    ERROR("\n\nro.root_device = %s; errno = %d; fstab_final_name=%s\n", boot_prop_value, ret, fstab_final);
     return;
 }
 

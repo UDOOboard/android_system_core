@@ -809,6 +809,7 @@ static void export_kernel_boot_props() {
         { "ro.boot.bootloader", "ro.bootloader", "unknown", },
         { "ro.boot.hardware",   "ro.hardware",   "unknown", },
         { "ro.boot.revision",   "ro.revision",   "0", },
+        { "ro.boot.root_device", "ro.root_device", "sd", },
         { "ro.boot.zygote",     "ro.zygote",     "zygote32", },
     };
     for (size_t i = 0; i < ARRAY_SIZE(prop_map); i++) {

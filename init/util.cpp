@@ -43,6 +43,7 @@
 #include "init.h"
 #include "log.h"
 #include "util.h"
+#include "property_service.h"
 
 /*
  * android_name_to_id - returns the integer uid/gid associated with the given
@@ -361,6 +362,20 @@ void remove_link(const char *oldpath, const char *newpath)
     path[ret] = 0;
     if (!strcmp(path, oldpath))
         unlink(newpath);
+}
+
+void fix_fstab_path(const char *filename, char *fstab_final) 
+{
+    char boot_prop_value[PROP_VALUE_MAX] = {0};
+
+    int ret = property_get("ro.root_device", boot_prop_value);
+    if (ret) {
+        sprintf(fstab_final, "%s.%s", filename, boot_prop_value);
+    } else {
+	sprintf(fstab_final, "%s", filename);
+    }
+    ERROR("\n\nro.root_device = %s; errno = %d; fstab_final_name=%s\n", boot_prop_value, ret, fstab_final);
+    return;
 }
 
 int wait_for_file(const char *filename, int timeout)

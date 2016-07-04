@@ -21,6 +21,7 @@
 #include "fs_mgr_priv.h"
 
 char *me = "";
+void fix_fstab_path(const char *filename, char *fstab_final);
 
 static void usage(void)
 {
@@ -84,6 +85,7 @@ int main(int argc, char *argv[])
     char *n_blk_dev=NULL;
     char *fstab_file=NULL;
     struct fstab *fstab=NULL;
+    char *fstab_filename=NULL;
 
     klog_init();
     klog_set_level(6);
@@ -93,7 +95,8 @@ int main(int argc, char *argv[])
     /* The name of the fstab file is last, after the option */
     fstab_file = argv[argc - 1];
 
-    fstab = fs_mgr_read_fstab(fstab_file);
+    fix_fstab_path(fstab_file, fstab_filename);
+    fstab = fs_mgr_read_fstab(fstab_filename);
 
     if (a_flag) {
         return fs_mgr_mount_all(fstab);

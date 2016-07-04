@@ -61,6 +61,7 @@
 
 static int persistent_properties_loaded = 0;
 static bool property_area_initialized = false;
+void fix_fstab_path(const char *filename, char *fstab_final);
 
 static int property_set_fd = -1;
 
@@ -521,14 +522,18 @@ void load_persist_props(void) {
 }
 
 void load_recovery_id_prop() {
-    char fstab_filename[PROP_VALUE_MAX + sizeof(FSTAB_PREFIX)];
+    char fstab_filename_orig[PROP_VALUE_MAX + sizeof(FSTAB_PREFIX)];
     char propbuf[PROP_VALUE_MAX];
+    char fstab_filename[64];
+
     int ret = property_get("ro.hardware", propbuf);
     if (!ret) {
         ERROR("ro.hardware not set - unable to load recovery id\n");
         return;
     }
-    snprintf(fstab_filename, sizeof(fstab_filename), FSTAB_PREFIX "%s", propbuf);
+
+    snprintf(fstab_filename_orig, sizeof(fstab_filename_orig), FSTAB_PREFIX "%s", propbuf);
+    fix_fstab_path(fstab_filename_orig, fstab_filename);
 
     std::unique_ptr<fstab, void(*)(fstab*)> tab(fs_mgr_read_fstab(fstab_filename),
             fs_mgr_free_fstab);

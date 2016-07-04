@@ -51,6 +51,7 @@
 #define chmod DO_NOT_USE_CHMOD_USE_FCHMODAT_SYMLINK_NOFOLLOW
 
 int add_environment(const char *name, const char *value);
+void fix_fstab_path(const char *filename, char *fstab_final);
 
 // System call provided by bionic but not in any header file.
 extern "C" int init_module(void *, unsigned long, const char *);
@@ -402,6 +403,7 @@ int do_mount_all(int nargs, char **args)
     int child_ret = -1;
     int status;
     struct fstab *fstab;
+    char fstab_filename[64];
 
     if (nargs != 2) {
         return -1;
@@ -430,7 +432,8 @@ int do_mount_all(int nargs, char **args)
     } else if (pid == 0) {
         /* child, call fs_mgr_mount_all() */
         klog_set_level(6);  /* So we can see what fs_mgr_mount_all() does */
-        fstab = fs_mgr_read_fstab(args[1]);
+        fix_fstab_path(args[1], fstab_filename);
+        fstab = fs_mgr_read_fstab(fstab_filename);
         child_ret = fs_mgr_mount_all(fstab);
         fs_mgr_free_fstab(fstab);
         if (child_ret == -1) {
@@ -488,8 +491,10 @@ int do_swapon_all(int nargs, char **args)
 {
     struct fstab *fstab;
     int ret;
+    char fstab_filename[64];
 
-    fstab = fs_mgr_read_fstab(args[1]);
+    fix_fstab_path(args[1], fstab_filename);
+    fstab = fs_mgr_read_fstab(fstab_filename);
     ret = fs_mgr_swapon_all(fstab);
     fs_mgr_free_fstab(fstab);
 

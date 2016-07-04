@@ -841,6 +841,7 @@ int fs_mgr_load_verity_state(int *mode)
 {
     char fstab_filename[PROPERTY_VALUE_MAX + sizeof(FSTAB_PREFIX)];
     char propbuf[PROPERTY_VALUE_MAX];
+    char boot_prop_value[PROP_VALUE_MAX] = {0};
     int rc = -1;
     int i;
     int current;
@@ -851,7 +852,13 @@ int fs_mgr_load_verity_state(int *mode)
     *mode = VERITY_MODE_DEFAULT;
 
     property_get("ro.hardware", propbuf, "");
-    snprintf(fstab_filename, sizeof(fstab_filename), FSTAB_PREFIX"%s", propbuf);
+    int ret = property_get("ro.root_device", boot_prop_value, "");
+    if (ret) {
+        snprintf(fstab_filename, sizeof(fstab_filename), FSTAB_PREFIX"%s.%s", propbuf, boot_prop_value);
+    } else {
+        snprintf(fstab_filename, sizeof(fstab_filename), FSTAB_PREFIX"%s", propbuf);
+    }
+
 
     fstab = fs_mgr_read_fstab(fstab_filename);
 

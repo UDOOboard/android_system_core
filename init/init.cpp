@@ -739,9 +739,10 @@ static int console_init_action(int nargs, char **args)
 
     fd = open("/dev/tty0", O_WRONLY | O_CLOEXEC);
     if (fd >= 0) {
+/*    
         const char *msg;
             msg = "\n"
-        "\n"
+	    "\n"
         "\n"
         "\n"
         "\n"
@@ -756,6 +757,7 @@ static int console_init_action(int nargs, char **args)
         "\n"
         "             A N D R O I D ";
         write(fd, msg, strlen(msg));
+*/
         close(fd);
     }
 

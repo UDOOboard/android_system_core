@@ -21,6 +21,8 @@ on early-init
     start ueventd
 
 on init
+    restart ueventd
+
     sysclktz 0
 
     # Backward compatibility.
